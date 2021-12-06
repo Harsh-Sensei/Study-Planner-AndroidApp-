@@ -1,3 +1,12 @@
 <resources>
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
     <string name="app_name">StudyPlanner</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_tabbed_planner">TabbedPlanner</string>
+    <string name="tab_text_1">Study Plan</string>
+    <string name="tab_text_2">Assignment</string>
+    <string name="tab_text_3">Exam</string>
+    <string name="tab_text_4">Lecture</string>
 </resources>

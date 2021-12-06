@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="HardcodedText">
+
+    <item
+        android:id="@+id/nav_home"
+        android:title="Home"
+        android:icon="@drawable/ic_baseline_home_24"/>
+
+    <item
+        android:id="@+id/nav_events"
+        android:title="Events"
+        android:icon="@drawable/ic_baseline_event_24"/>
+
+    <item
+        android:id="@+id/nav_calender"
+        android:title="Calendar"
+        android:icon="@drawable/ic_baseline_calendar_today_24"/>
+
+</menu>
