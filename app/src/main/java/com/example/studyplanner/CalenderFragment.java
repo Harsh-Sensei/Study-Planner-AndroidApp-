@@ -1,19 +1,33 @@
 package com.example.studyplanner;
 
+import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 import android.widget.TextView;
 
+import com.github.sundeepk.compactcalendarview.CompactCalendarView;
+import com.github.sundeepk.compactcalendarview.domain.Event;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,15 +35,18 @@ import java.util.ArrayList;
  * create an instance of this fragment.
  */
 public class CalenderFragment extends Fragment {
-    CalendarView calendarView;
+    CompactCalendarView calendarView;
     TextView table_date;
     TextView study_events;
     TextView assgn_events;
     TextView lecture_events;
     TextView exam_events;
+    TextView month_year_txt;
 
     Database DB;
     SQLiteDatabase EventsDB;
+
+    SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMM - yyyy", Locale.getDefault());
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -88,45 +105,75 @@ public class CalenderFragment extends Fragment {
         assgn_events = view.findViewById(R.id.table_assgn_id);
         lecture_events = view.findViewById(R.id.table_lect_id);
         exam_events = view.findViewById(R.id.table_exam_id);
+        month_year_txt = view.findViewById(R.id.month_year_id);
+        calendarView = view.findViewById(R.id.compactcalendar_view);
+        dateFormatForMonth = new SimpleDateFormat("MMM - yyyy", Locale.getDefault());
 
-        calendarView = view.findViewById(R.id.calendarView);
+//        calendarView
+//                .setOnDateChangeListener(
+//                        new CalendarView
+//                                .OnDateChangeListener() {
+//                            @Override
+//
+//                            // In this Listener have one method
+//                            // and in this method we will
+//                            // get the value of DAYS, MONTH, YEARS
+//                            public void onSelectedDayChange(
+//                                    @NonNull CalendarView view,
+//                                    int year,
+//                                    int month,
+//                                    int dayOfMonth)
+//                            {
+//
+//                                // Store the value of date with
+//                                // format in String type Variable
+//                                // Add 1 in month because month
+//                                // index is start with 0
+//                                String Date
+//                                        = dayOfMonth + "-"
+//                                        + (month + 1) + "-" + year;
+//
+//
+//                                ArrayList<String> events_info = getEventsInfo(Date);
+//                                // set this date in TextView for Display
+//                                table_date.setText(Date);
+//
+//                                study_events.setText(events_info.get(0));
+//                                assgn_events.setText(events_info.get(1));
+//                                lecture_events.setText(events_info.get(2));
+//                                exam_events.setText(events_info.get(3));
+//
+//                            }
+//                        });
 
-        calendarView
-                .setOnDateChangeListener(
-                        new CalendarView
-                                .OnDateChangeListener() {
-                            @Override
 
-                            // In this Listener have one method
-                            // and in this method we will
-                            // get the value of DAYS, MONTH, YEARS
-                            public void onSelectedDayChange(
-                                    @NonNull CalendarView view,
-                                    int year,
-                                    int month,
-                                    int dayOfMonth)
-                            {
+        addAllEvents();
+        month_year_txt.setText(dateFormatForMonth.format(calendarView.getFirstDayOfCurrentMonth()));
 
-                                // Store the value of date with
-                                // format in String type Variable
-                                // Add 1 in month because month
-                                // index is start with 0
-                                String Date
-                                        = dayOfMonth + "-"
-                                        + (month + 1) + "-" + year;
+        calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
 
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onDayClick(Date dateClicked) {
+                LocalDate localDate = dateClicked.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                String Date = localDate.getDayOfMonth() + "-" + localDate.getMonthValue() + "-" + localDate.getYear();
+                ArrayList<String> events_info = getEventsInfo(Date);
+                // set this date in TextView for Display
+                table_date.setText(Date);
 
-                                ArrayList<String> events_info = getEventsInfo(Date);
-                                // set this date in TextView for Display
-                                table_date.setText(Date);
+                study_events.setText(events_info.get(0));
+                assgn_events.setText(events_info.get(1));
+                lecture_events.setText(events_info.get(2));
+                exam_events.setText(events_info.get(3));
 
-                                study_events.setText(events_info.get(0));
-                                assgn_events.setText(events_info.get(1));
-                                lecture_events.setText(events_info.get(2));
-                                exam_events.setText(events_info.get(3));
+            }
 
-                            }
-                        });
+            @Override
+            public void onMonthScroll(Date firstDayOfNewMonth) {
+                month_year_txt.setText(dateFormatForMonth.format(firstDayOfNewMonth));
+            }
+        });
+
 
         return view;
     }
@@ -150,4 +197,34 @@ public class CalenderFragment extends Fragment {
 
         return result;
     }
+
+
+    private void addAllEvents(){
+        try {
+            Cursor cursor = EventsDB.rawQuery("Select * from EventDetails", new String[] {});
+
+            if (cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex("date"));
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                    Date date = sdf.parse(name);
+                    long millis = date.getTime();
+                    Event event = new Event(Color.GREEN, millis);
+
+                    calendarView.addEvent(event);
+                    cursor.moveToNext();
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        return;
+    }
+
 }
+
