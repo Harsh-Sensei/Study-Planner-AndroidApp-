@@ -158,6 +158,7 @@ public class CalenderFragment extends Fragment {
                 LocalDate localDate = dateClicked.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 String Date = localDate.getDayOfMonth() + "-" + localDate.getMonthValue() + "-" + localDate.getYear();
                 ArrayList<String> events_info = getEventsInfo(Date);
+
                 // set this date in TextView for Display
                 table_date.setText(Date);
 
@@ -165,7 +166,6 @@ public class CalenderFragment extends Fragment {
                 assgn_events.setText(events_info.get(1));
                 lecture_events.setText(events_info.get(2));
                 exam_events.setText(events_info.get(3));
-
             }
 
             @Override
@@ -199,6 +199,7 @@ public class CalenderFragment extends Fragment {
     }
 
 
+    @SuppressLint("Range")
     private void addAllEvents(){
         try {
             Cursor cursor = EventsDB.rawQuery("Select * from EventDetails", new String[] {});
@@ -210,10 +211,16 @@ public class CalenderFragment extends Fragment {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                     Date date = sdf.parse(name);
                     long millis = date.getTime();
-                    Event event = new Event(Color.GREEN, millis);
+
+                    Event event;
+                    if (cursor.getString(cursor.getColumnIndex("eventType")).equals("Study Plan")) event = new Event(Color.GREEN, millis);
+                    else if (cursor.getString(cursor.getColumnIndex("eventType")).equals("Assignments")) event = new Event(Color.BLUE, millis);
+                    else if (cursor.getString(cursor.getColumnIndex("eventType")).equals("Exams")) event = new Event(Color.YELLOW, millis);
+                    else event = new Event(Color.BLACK, millis);
 
                     calendarView.addEvent(event);
                     cursor.moveToNext();
+
                 }
             }
         }
@@ -221,7 +228,6 @@ public class CalenderFragment extends Fragment {
         {
             e.printStackTrace();
         }
-
 
         return;
     }

@@ -99,8 +99,6 @@ public class AssignmentFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recycler_view_assignment);
 
-
-
         RecyclerAdapter recyclerAdapter = new RecyclerAdapter(getContext(), events_arr, date_arr, time_arr, description_arr);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());

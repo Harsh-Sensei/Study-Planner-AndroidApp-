@@ -69,15 +69,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     customActionBar.setTitle("Home");
                 }
             }
+            else
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,
+                        new HomeFragment()).commit();
+                navigationView.setCheckedItem(R.id.nav_home);
+            }
         }
 
-        else if (savedInstanceState == null)
-        {
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container,
-                    new HomeFragment()).commit();
-            navigationView.setCheckedItem(R.id.nav_home);
-        }
 
+//        if(savedInstanceState==null)
+//        {
+//
+//        }
 
     }
 
